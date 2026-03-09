@@ -27,8 +27,10 @@ Det jeg startet med å få gjort er å flashe ubuntu server på en gammel laptop
 
 Dette tok litt tid med formattering av usb disk osv, men fikk det fungerende etter en stund.
 
-Jeg glemte å sette opp nett i opprettingen av systemet, så da manglet jeg nett. Etter timer med research og hjelp ifra chatgpt fikk jeg satt opp nettet slikt:
+Jeg glemte å sette opp nett i opprettingen av systemet, så da manglet jeg nett. Etter timer med research og hjelp ifra chatgpt fikk jeg satt opp nettet og serveren slikt:
 
+
+## Feilsøking av Wi-Fi på Ubuntu Server
 
 ### 1. Sjekke at Wi-Fi-kortet blir oppdaget
 
@@ -52,15 +54,15 @@ Dette viser alle nettverksenheter og hvilken status de har. Her så jeg at Wi-Fi
 
 ---
 
-### 3. Sjekke om Wifi-kortet er aktivt
+### 3. Sjekke om Wi-Fi-kortet er aktivt
 
 ```
 ip link show wlp2s0
 ```
 
-Dette viser info om wifi-kortet, og om det er `UP` eller `DOWN`.
+Dette viser informasjon om Wi-Fi-kortet og om det er `UP` eller `DOWN`.
 
-Om det var `DOWN` prøvde jeg å aktivere det.
+Hvis det var `DOWN`, prøvde jeg å aktivere det.
 
 ```
 sudo ip link set wlp2s0 up
@@ -70,7 +72,7 @@ sudo ip link set wlp2s0 up
 
 ### 4. Sjekke om Wi-Fi er blokkert
 
-Linux kan blokkere Wi-Fi via noe som heter **rfkill**. Derfor sjekket jeg om Wi-Fi var blokkert av systemet.
+Linux kan blokkere Wi-Fi via noe som heter **rfkill**, så jeg sjekket om Wi-Fi var blokkert av systemet.
 
 ```
 for f in /sys/class/rfkill/*; do echo "== $f =="; cat "$f/type" "$f/soft" "$f/hard" 2>/dev/null; done
@@ -80,7 +82,7 @@ Dette viste at Wi-Fi ikke var blokkert.
 
 ---
 
-### 5. Sjekke Wifi-nettverk
+### 5. Sjekke Wi-Fi-nettverk
 
 Da sjekket jeg hvilke nettverk som var tilgjengelige.
 
@@ -88,7 +90,7 @@ Da sjekket jeg hvilke nettverk som var tilgjengelige.
 nmcli device wifi list
 ```
 
-Denne listen var helt tom, så da prøvde jeg å kjøre en rescan.
+Denne listen var helt tom, så jeg prøvde å kjøre en rescan.
 
 ```
 nmcli device wifi rescan
@@ -137,7 +139,7 @@ sudo netplan apply
 
 ### 9. Starte nettverkstjenester på nytt
 
-Det virket som om nettverkstjenestene hadde hengt seg opp. Da prøvde jeg å restarte tjenestene.
+Det virket som om nettverkstjenestene hadde hengt seg opp, så jeg restartet dem.
 
 ```
 sudo systemctl restart NetworkManager
@@ -145,22 +147,22 @@ sudo systemctl restart NetworkManager
 
 ---
 
-### 10. Reset av Wifi-driver
+### 10. Reset av Wi-Fi-driver
 
-For å resette intel wifi-driveren:
+For å resette Intel-driveren:
 
 ```
 sudo modprobe -r iwlwifi
 sudo modprobe iwlwifi
 ```
 
-Dette fjerner driveren helt og laster den inn på nytt.
+Dette fjerner driveren og laster den inn på nytt.
 
 ---
 
 ### 11. Stoppe konflikter med wpa_supplicant
 
-For å sikre at ingen andre prosesser kontrollerte Wi-Fi-kortet (det var noen andre prosesser som prøvde dette):
+Under feilsøkingen oppdaget jeg at andre prosesser forsøkte å kontrollere Wi-Fi-kortet. For å stoppe dette brukte jeg:
 
 ```
 sudo pkill wpa_supplicant
@@ -168,9 +170,9 @@ sudo pkill wpa_supplicant
 
 ---
 
-### 12. Slå av og på Wifi
+### 12. Slå av og på Wi-Fi
 
-Til slutt viste det seg at Wi-Fi-radioen ikke skannet etter nettverk. Da løste jeg det ved å slå Wi-Fi av og på igjen.
+Til slutt viste det seg at Wi-Fi-radioen ikke skannet etter nettverk. Dette ble løst ved å slå Wi-Fi av og på igjen.
 
 ```
 nmcli radio wifi off
@@ -182,12 +184,26 @@ Etter dette begynte systemet å oppdage trådløse nettverk igjen, og jeg fikk k
 ---
 
 ### Målet
-Målet med denne prosessen var å kunne få koblet meg opp til linuxen med ssh via macen senere.
-Så ville jeg selvfølgelig kunne lukke linux-laptopen uten at jeg skulle bli koblet fra. Så da endret jeg **logind-konfigurasjonen** så lokk-lukking ble ignorert.
+
+Målet med denne prosessen var å kunne koble meg til Linux-maskinen via **SSH fra Mac-en min senere**.
+
+Jeg ønsket også å kunne bruke laptopen som en liten server og derfor kunne lukke lokket uten at maskinen gikk i hvilemodus. Dette gjorde jeg ved å endre **logind-konfigurasjonen**.
+
 ```
 sudo nano /etc/systemd/logind.conf
+```
+
+Der satte jeg:
+
+```
 HandleLidSwitch=ignore
+```
+
+Deretter restartet jeg tjenesten:
+
+```
 sudo systemctl restart systemd-logind
 ```
 
----
+Dette gjør at maskinen fortsetter å kjøre selv om lokket lukkes.
+
