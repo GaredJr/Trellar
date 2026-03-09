@@ -178,3 +178,16 @@ nmcli radio wifi on
 ```
 
 Etter dette begynte systemet å oppdage trådløse nettverk igjen, og jeg fikk koblet serveren til internett.
+
+---
+
+### Målet
+Målet med denne prosessen var å kunne få koblet meg opp til linuxen med ssh via macen senere.
+Så ville jeg selvfølgelig kunne lukke linux-laptopen uten at jeg skulle bli koblet fra. Så da endret jeg **logind-konfigurasjonen** så lokk-lukking ble ignorert.
+```
+sudo nano /etc/systemd/logind.conf
+HandleLidSwitch=ignore
+sudo systemctl restart systemd-logind
+```
+
+---
