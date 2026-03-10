@@ -1,26 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block tittel %}Trellar{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Trellar{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <a href="/">Trellar</a>
-        <nav>
-            <a href="/board">Board</a>
-            <a href="/user">User</a>
-        </nav>
-    </header>
-    <main>
-        <div>
-            <h1>{% block innhold %}{% endblock %}</h1>
-        </div>
-    </main>
-    <footer>
-        <p>© Copyright Trellar @2026</p>
-    </footer>
+    <div class="app">
+        <header class="topbar">
+            <div class="container topbar-inner">
+                <a class="brand" href="{{ url_for('home') }}">Trellar</a>
+                <nav class="topnav" aria-label="Primary">
+                    <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}is-active{% endif %}">Home</a>
+                    <a href="{{ url_for('boards') }}" class="{% if active_page == 'boards' %}is-active{% endif %}">Boards</a>
+                    <a href="{{ url_for('activity') }}" class="{% if active_page == 'activity' %}is-active{% endif %}">Activity</a>
+                    <a href="{{ url_for('user') }}" class="{% if active_page == 'user' %}is-active{% endif %}">User</a>
+                    <a href="{{ url_for('settings') }}" class="{% if active_page == 'settings' %}is-active{% endif %}">Settings</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="page {% block page_class %}{% endblock %}">
+            <div class="container {% block container_class %}{% endblock %}">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container footer-inner">
+                <span>Trellar</span>
+                <span>VS Code-inspired dark workspace</span>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>

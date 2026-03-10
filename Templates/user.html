@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel user-panel">
+    <div class="profile-head">
+        <div class="avatar">GH</div>
+        <div>
+            <h1 class="page-title">Gard H.</h1>
+            <p class="lead">Workspace owner - Product and engineering coordination</p>
+        </div>
+    </div>
+    <div class="tag-row">
+        <span class="tag">12 boards</span>
+        <span class="tag">24 open cards</span>
+        <span class="tag">Last active 20m ago</span>
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Profile</h2>
+    <div class="form-grid">
+        <label>
+            Display Name
+            <input class="input" type="text" value="Gard H." />
+        </label>
+        <label>
+            Email
+            <input class="input" type="email" value="gard@example.com" />
+        </label>
+    </div>
+    <label>
+        About
+        <textarea class="textarea" rows="4">Building Trellar one release at a time.</textarea>
+    </label>
+    <div class="board-actions">
+        <button class="button button-primary" type="button">Save profile</button>
+        <button class="button button-ghost" type="button">Cancel</button>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Workspace</p>
+            <h1 class="page-title">Activity</h1>
+        </div>
+        <button class="button button-ghost" type="button">Export log</button>
+    </div>
+    <p class="lead">Recent board and card activity from your team.</p>
+</section>
+
+<section class="panel">
+    <div class="activity-list">
+        {% for item in activity_items %}
+        <article class="card activity-item">
+            <div class="avatar">{{ loop.index }}</div>
+            <div>
+                <h2 class="card-title">{{ item.title }}</h2>
+                <p class="card-meta">{{ item.meta }}</p>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
