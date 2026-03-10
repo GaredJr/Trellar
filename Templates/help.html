@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="{{ url_for('home') }}">{{ t('breadcrumbs.home') }}</a></li>
+        <li aria-current="page">{{ t('breadcrumbs.help') }}</li>
+    </ol>
+</nav>
+
+<section class="panel" aria-labelledby="help-title">
+    <p class="eyebrow">{{ t('nav.help') }}</p>
+    <h1 class="page-title" id="help-title">{{ t('help.title') }}</h1>
+    <p class="lead">{{ t('help.lead') }}</p>
+</section>
+
+<section class="panel" aria-labelledby="help-nav-title">
+    <h2 id="help-nav-title">{{ t('help.section_nav') }}</h2>
+    <table class="shortcut-table">
+        <thead>
+            <tr>
+                <th scope="col">{{ t('help.key') }}</th>
+                <th scope="col">{{ t('help.action') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><kbd>{{ t('help.nav_tab') }}</kbd></td>
+                <td>{{ t('help.nav_tab_action') }}</td>
+            </tr>
+            <tr>
+                <td><kbd>{{ t('help.nav_skip') }}</kbd></td>
+                <td>{{ t('help.nav_skip_action') }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="panel" aria-labelledby="help-board-title">
+    <h2 id="help-board-title">{{ t('help.section_board') }}</h2>
+    <table class="shortcut-table">
+        <thead>
+            <tr>
+                <th scope="col">{{ t('help.key') }}</th>
+                <th scope="col">{{ t('help.action') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><kbd>{{ t('help.board_move') }}</kbd></td>
+                <td>{{ t('help.board_move_action') }}</td>
+            </tr>
+            <tr>
+                <td><kbd>{{ t('help.board_menu') }}</kbd></td>
+                <td>{{ t('help.board_menu_action') }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="panel" aria-labelledby="help-forms-title">
+    <h2 id="help-forms-title">{{ t('help.section_forms') }}</h2>
+    <table class="shortcut-table">
+        <thead>
+            <tr>
+                <th scope="col">{{ t('help.key') }}</th>
+                <th scope="col">{{ t('help.action') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><kbd>{{ t('help.forms_submit') }}</kbd></td>
+                <td>{{ t('help.forms_submit_action') }}</td>
+            </tr>
+            <tr>
+                <td><kbd>{{ t('help.forms_reset') }}</kbd></td>
+                <td>{{ t('help.forms_reset_action') }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+{% endblock %}

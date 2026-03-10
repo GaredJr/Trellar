@@ -1,27 +1,128 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ document_lang|default('en') }}" dir="{{ document_dir|default('ltr') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Trellar{% endblock %}</title>
+    <title>{% block title %}{{ t('brand.name') }}{% endblock %}</title>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/Lemon Milk Pro Regular.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/Lemon Milk Pro Bold.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <a class="skip-link" href="#main-content">{{ t('skip.main') }}</a>
+    <a class="skip-link skip-link-secondary" href="#site-nav">{{ t('skip.nav') }}</a>
+    {% block extra_skip %}{% endblock %}
+
     <div class="app">
         <header class="topbar">
             <div class="container topbar-inner">
-                <a class="brand" href="{{ url_for('home') }}">Trellar</a>
-                <nav class="topnav" aria-label="Primary">
-                    <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}is-active{% endif %}">Home</a>
-                    <a href="{{ url_for('boards') }}" class="{% if active_page == 'boards' %}is-active{% endif %}">Boards</a>
-                    <a href="{{ url_for('activity') }}" class="{% if active_page == 'activity' %}is-active{% endif %}">Activity</a>
-                    <a href="{{ url_for('user') }}" class="{% if active_page == 'user' %}is-active{% endif %}">User</a>
-                    <a href="{{ url_for('settings') }}" class="{% if active_page == 'settings' %}is-active{% endif %}">Settings</a>
-                </nav>
+                <a class="brand" href="{{ url_for('home') }}">{{ t('brand.name') }}</a>
+
+                <div class="topbar-controls">
+                    <button
+                        class="button button-ghost nav-toggle"
+                        id="nav-toggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="site-nav"
+                    >
+                        <span aria-hidden="true">=</span>
+                        <span>{{ t('nav.menu') }}</span>
+                    </button>
+
+                    <nav class="topnav" id="site-nav" aria-label="Primary" aria-describedby="topnav-hint">
+                        {% if is_authenticated %}
+                        <a href="{{ url_for('home') }}" {% if active_page == 'home' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.home') }}</a>
+                        <a href="{{ url_for('boards') }}" {% if active_page == 'boards' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.boards') }}</a>
+                        <a href="{{ url_for('activity') }}" {% if active_page == 'activity' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.activity') }}</a>
+                        <a href="{{ url_for('user') }}" {% if active_page == 'user' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.user') }}</a>
+                        <a href="{{ url_for('settings') }}" {% if active_page == 'settings' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.settings') }}</a>
+                        <a href="{{ url_for('help_page') }}" {% if active_page == 'help' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.help') }}</a>
+                        {% else %}
+                        <a href="{{ url_for('login') }}" {% if active_page == 'login' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.login') }}</a>
+                        {% endif %}
+                    </nav>
+
+                    {% if is_authenticated %}
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button class="button button-ghost" type="submit">{{ t('nav.logout') }}</button>
+                    </form>
+                    {% endif %}
+
+                    <form class="language-form" action="{{ url_for('set_language') }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}">
+                        <label class="sr-only" for="language-select">{{ t('lang.label') }}</label>
+                        <select class="input" id="language-select" name="lang">
+                            {% for language in available_languages %}
+                            <option value="{{ language.code }}" {% if language.code == current_lang %}selected{% endif %}>{{ language.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="button button-ghost" type="submit">{{ t('lang.submit') }}</button>
+                    </form>
+
+                    <button
+                        class="button button-ghost"
+                        id="prefs-toggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="prefs-panel"
+                    >
+                        <span aria-hidden="true">*</span>
+                        <span>{{ t('prefs.title') }}</span>
+                    </button>
+                </div>
             </div>
+
+            <section class="prefs-panel panel" id="prefs-panel" hidden aria-label="{{ t('prefs.title') }}">
+                <p class="prefs-description">{{ t('prefs.description') }}</p>
+                <div class="prefs-grid">
+                    <label for="pref-theme">{{ t('prefs.theme') }}</label>
+                    <select class="input" id="pref-theme" data-pref="theme">
+                        <option value="system">{{ t('prefs.theme.system') }}</option>
+                        <option value="dark">{{ t('prefs.theme.dark') }}</option>
+                        <option value="light">{{ t('prefs.theme.light') }}</option>
+                    </select>
+
+                    <label for="pref-contrast">{{ t('prefs.contrast') }}</label>
+                    <select class="input" id="pref-contrast" data-pref="contrast">
+                        <option value="default">{{ t('prefs.contrast.default') }}</option>
+                        <option value="more">{{ t('prefs.contrast.more') }}</option>
+                    </select>
+
+                    <label for="pref-text">{{ t('prefs.text') }}</label>
+                    <select class="input" id="pref-text" data-pref="text">
+                        <option value="default">{{ t('prefs.text.default') }}</option>
+                        <option value="large">{{ t('prefs.text.large') }}</option>
+                    </select>
+
+                    <label for="pref-motion">{{ t('prefs.motion') }}</label>
+                    <select class="input" id="pref-motion" data-pref="motion">
+                        <option value="default">{{ t('prefs.motion.default') }}</option>
+                        <option value="reduce">{{ t('prefs.motion.reduce') }}</option>
+                    </select>
+                </div>
+                <button class="button button-primary" type="button" id="prefs-save">{{ t('prefs.save') }}</button>
+            </section>
+
+            <p class="topnav-hint" id="topnav-hint">{{ t('topnav.swipe_hint') }}</p>
         </header>
 
-        <main class="page {% block page_class %}{% endblock %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <section class="container flash-stack" aria-live="polite">
+                {% for category, message in messages %}
+                <article class="flash flash-{{ category }}" role="alert" tabindex="-1">
+                    <p>{{ message }}</p>
+                    <button class="flash-close" type="button" data-dismiss-flash aria-label="{{ t('common.close') }}">x</button>
+                </article>
+                {% endfor %}
+            </section>
+            {% endif %}
+        {% endwith %}
+
+        <main id="main-content" class="page {% block page_class %}{% endblock %}" tabindex="-1">
             <div class="container {% block container_class %}{% endblock %}">
                 {% block content %}{% endblock %}
             </div>
@@ -29,10 +130,81 @@
 
         <footer class="footer">
             <div class="container footer-inner">
-                <span>Trellar</span>
-                <span>VS Code-inspired dark workspace</span>
+                <span>{{ t('brand.name') }}</span>
+                <span>{{ t('footer.tagline') }}</span>
+                <div class="footer-links">
+                    <a href="/docs/activity-privacy.md">{{ t('footer.privacy') }}</a>
+                    <a href="/docs/uu-acceptance-checklist.md">{{ t('footer.checklist') }}</a>
+                    <a href="/docs/performance-budget.md">{{ t('footer.budget') }}</a>
+                </div>
             </div>
         </footer>
     </div>
+
+    <div class="modal-overlay" id="confirm-modal" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+            <h2 id="confirm-title">{{ t('confirm.title') }}</h2>
+            <p id="confirm-message"></p>
+            <div class="board-actions">
+                <button class="button button-primary" type="button" id="confirm-accept">{{ t('confirm.accept') }}</button>
+                <button class="button button-ghost" type="button" id="confirm-cancel">{{ t('confirm.cancel') }}</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editor-modal" hidden>
+        <div class="modal modal-editor" role="dialog" aria-modal="true" aria-labelledby="editor-title" aria-describedby="editor-description">
+            <h2 id="editor-title"></h2>
+            <p id="editor-description"></p>
+            <p class="modal-error" id="editor-error" role="alert" hidden></p>
+            <form id="editor-form" class="modal-form" novalidate>
+                <div class="field">
+                    <label id="editor-primary-label" for="editor-primary-input"></label>
+                    <input class="input" id="editor-primary-input" type="text" autocomplete="off" required>
+                </div>
+                <div class="field">
+                    <label id="editor-secondary-label" for="editor-secondary-input"></label>
+                    <textarea class="textarea" id="editor-secondary-input" rows="3"></textarea>
+                </div>
+                <div class="board-actions">
+                    <button class="button button-primary" type="submit" id="editor-submit">{{ t('common.create') }}</button>
+                    <button class="button button-ghost" type="button" id="editor-cancel">{{ t('common.cancel') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+    <script>
+        window.trellarMessages = {
+            undo: {{ t('common.undo')|tojson }},
+            statusSaving: {{ t('status.saving')|tojson }},
+            boardMoved: {{ t('board.moved', title='__TITLE__', lane='__LANE__')|tojson }},
+            boardArchived: {{ t('board.archived', title='__TITLE__')|tojson }},
+            boardUndoDone: {{ t('board.undo_done')|tojson }},
+            boardAdded: {{ t('board.added', title='__TITLE__', lane='__LANE__')|tojson }},
+            boardAddPromptTitle: {{ t('board.add_prompt_title')|tojson }},
+            boardAddPromptMeta: {{ t('board.add_prompt_meta')|tojson }},
+            boardAddError: {{ t('board.add_error')|tojson }},
+            boardCreatePromptName: {{ t('boards.create_prompt_name')|tojson }},
+            boardCreatePromptDescription: {{ t('boards.create_prompt_description')|tojson }},
+            boardCreateError: {{ t('boards.create_error')|tojson }},
+            boardCreateTitle: {{ t('boards.create')|tojson }},
+            boardCreateDescription: {{ t('boards.lead')|tojson }},
+            boardCardActions: {{ t('board.card_actions')|tojson }},
+            boardMoveLeft: {{ t('board.move_left')|tojson }},
+            boardMoveRight: {{ t('board.move_right')|tojson }},
+            boardArchive: {{ t('board.archive')|tojson }},
+            boardStatusPrefix: {{ t('board.status_prefix')|tojson }},
+            boardConfirmArchive: {{ t('board.confirm_archive')|tojson }},
+            boardAddTitle: {{ t('board.add_card')|tojson }},
+            boardAddToLane: {{ t('board.add_to_lane', lane='__LANE__')|tojson }},
+            errorRequired: {{ t('error.required')|tojson }},
+            commonCreate: {{ t('common.create')|tojson }},
+            csrfToken: {{ csrf_token|tojson }}
+        };
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </body>
 </html>
