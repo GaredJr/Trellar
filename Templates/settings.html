@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <p class="eyebrow">Workspace</p>
+    <h1 class="page-title">Settings</h1>
+    <p class="lead">Manage team preferences, notifications, and board defaults.</p>
+</section>
+
+<section class="settings-grid">
+    <article class="panel">
+        <h2>General</h2>
+        <label>
+            Workspace Name
+            <input class="input" type="text" value="Trellar Team" />
+        </label>
+        <label>
+            Default Visibility
+            <input class="input" type="text" value="Private" />
+        </label>
+    </article>
+
+    <article class="panel">
+        <h2>Notifications</h2>
+        <label>
+            Email digest frequency
+            <input class="input" type="text" value="Daily" />
+        </label>
+        <label>
+            Channel
+            <input class="input" type="text" value="#trellar-updates" />
+        </label>
+    </article>
+    <article class="panel">
+        <h2>Automation</h2>
+        <label>
+            Card template
+            <textarea class="textarea" rows="4">Owner - Due date - Acceptance criteria</textarea>
+        </label>
+        <div class="board-actions">
+            <button class="button button-primary" type="button">Save changes</button>
+            <button class="button button-ghost" type="button">Reset</button>
+        </div>
+    </article>
+</section>
+{% endblock %}

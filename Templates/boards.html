@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Workspace</p>
+            <h1 class="page-title">Boards</h1>
+        </div>
+        <button class="button button-primary" type="button">Create board</button>
+    </div>
+    <p class="lead">All active boards in your Trellar workspace.</p>
+</section>
+
+<section class="board-grid">
+    {% for board in boards %}
+    <article class="panel board-tile">
+        <h2>{{ board.name }}</h2>
+        <p class="card-meta">{{ board.description }}</p>
+        <div class="board-tile-foot">
+            <span class="tag">{{ board.members }} members</span>
+            <a class="button button-ghost" href="{{ url_for('board', slug=board.slug) }}">Open board</a>
+        </div>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

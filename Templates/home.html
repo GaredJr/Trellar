@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel hero-panel">
+    <p class="eyebrow">Workspace Overview</p>
+    <h1 class="page-title">Plan faster with boards that stay focused.</h1>
+    <p class="lead">
+        Trellar keeps your team aligned with clean, readable boards and a calm workflow.
+        Start from existing boards or jump straight into the active roadmap.
+    </p>
+    <div class="board-actions">
+        <a class="button button-primary" href="{{ url_for('boards') }}">Open boards</a>
+        <a class="button button-ghost" href="{{ url_for('board_alias') }}">Open sample board</a>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="section-head">
+        <h2>Recent Boards</h2>
+        <a class="button button-ghost" href="{{ url_for('boards') }}">View all</a>
+    </div>
+    <div class="board-grid">
+        {% for board in boards %}
+        <a class="card board-card" href="{{ url_for('board', slug=board.slug) }}">
+            <h3 class="card-title">{{ board.name }}</h3>
+            <p class="card-meta">{{ board.description }}</p>
+            <div class="board-card-foot">
+                <span class="tag">{{ board.members }} members</span>
+                <span class="button button-ghost">Open</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

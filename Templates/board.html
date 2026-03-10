@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block container_class %}container-wide{% endblock %}
+
+{% block content %}
+<div class="board-shell">
+    <header class="board-header">
+        <div>
+            <p class="eyebrow">Board</p>
+            <h1 class="board-title">{{ board.name }}</h1>
+            <p class="card-meta">{{ board.description }}</p>
+        </div>
+        <div class="board-actions">
+            <button class="button button-ghost" type="button">Filter</button>
+            <button class="button button-ghost" type="button">Invite</button>
+            <button class="button button-primary" type="button">Add card</button>
+        </div>
+    </header>
+
+    <section class="lanes" aria-label="Board lanes">
+        {% for lane in board.lanes %}
+        <article class="lane">
+            <header class="lane-head">
+                <h2 class="lane-title">{{ lane.name }}</h2>
+                <span class="lane-count">{{ lane.cards|length }}</span>
+            </header>
+
+            <div class="card-list">
+                {% for card in lane.cards %}
+                <article class="card">
+                    <h3 class="card-title">{{ card.title }}</h3>
+                    <p class="card-meta">{{ card.meta }}</p>
+                </article>
+                {% endfor %}
+            </div>
+
+            <footer class="lane-foot">
+                <button class="button button-ghost" type="button">Add card</button>
+            </footer>
+        </article>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}
