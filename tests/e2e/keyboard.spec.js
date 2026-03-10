@@ -7,7 +7,7 @@ async function login(page) {
   await page.goto('/login');
   await page.fill('#email', DEMO_EMAIL);
   await page.fill('#password', DEMO_PASSWORD);
-  await page.click('button[type="submit"]');
+  await page.locator('form[action="/login"] button[type="submit"]').click();
   await expect(page).toHaveURL(/\/$/);
 }
 
@@ -38,6 +38,6 @@ test('board card can move with keyboard shortcut', async ({ page }) => {
 test('user form shows validation summary on invalid email', async ({ page }) => {
   await page.goto('/user');
   await page.fill('#email', 'invalid-email');
-  await page.click('button[type="submit"]');
+  await page.locator('form[action="/user"] button[type="submit"]').click();
   await expect(page.locator('.error-summary')).toBeVisible();
 });
