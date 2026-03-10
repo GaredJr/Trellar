@@ -3,43 +3,126 @@
 {% block title %}{{ title }}{% endblock %}
 {% block container_class %}container-wide{% endblock %}
 
+{% block extra_skip %}
+<a class="skip-link skip-link-tertiary" href="#board-lanes">{{ t('skip.board') }}</a>
+{% endblock %}
+
 {% block content %}
 <div class="board-shell">
-    <header class="board-header">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="{{ url_for('home') }}">{{ t('breadcrumbs.home') }}</a></li>
+            <li><a href="{{ url_for('boards') }}">{{ t('breadcrumbs.boards') }}</a></li>
+            <li aria-current="page">{{ board.name }}</li>
+        </ol>
+    </nav>
+
+    <header class="board-header" aria-labelledby="board-page-title">
         <div>
-            <p class="eyebrow">Board</p>
-            <h1 class="board-title">{{ board.name }}</h1>
+            <p class="eyebrow">{{ t('board.eyebrow') }}</p>
+            <h1 class="board-title" id="board-page-title">{{ board.name }}</h1>
             <p class="card-meta">{{ board.description }}</p>
         </div>
         <div class="board-actions">
-            <button class="button button-ghost" type="button">Filter</button>
-            <button class="button button-ghost" type="button">Invite</button>
-            <button class="button button-primary" type="button">Add card</button>
+            <button class="button button-ghost" type="button" aria-label="{{ t('board.filter') }} {{ board.name }}">
+                <span aria-hidden="true">[]</span>
+                <span>{{ t('board.filter') }}</span>
+            </button>
+            <button class="button button-ghost" type="button" aria-label="{{ t('board.invite') }} {{ board.name }}">
+                <span aria-hidden="true">+</span>
+                <span>{{ t('board.invite') }}</span>
+            </button>
+            <button
+                class="button button-primary"
+                type="button"
+                data-add-card
+                data-lane-index="0"
+                aria-label="{{ t('board.add_card') }} {{ board.name }}"
+            >
+                <span aria-hidden="true">+</span>
+                <span>{{ t('board.add_card') }}</span>
+            </button>
         </div>
     </header>
 
-    <section class="lanes" aria-label="Board lanes">
-        {% for lane in board.lanes %}
-        <article class="lane">
-            <header class="lane-head">
-                <h2 class="lane-title">{{ lane.name }}</h2>
-                <span class="lane-count">{{ lane.cards|length }}</span>
-            </header>
+    <div class="page-layout board-layout">
+        <section>
+            <p class="sr-only" id="lane-scroll-help">{{ t('board.lane_scroll_help') }}</p>
+            <p class="sr-only" id="board-live" role="status" aria-live="polite"></p>
 
-            <div class="card-list">
-                {% for card in lane.cards %}
-                <article class="card">
-                    <h3 class="card-title">{{ card.title }}</h3>
-                    <p class="card-meta">{{ card.meta }}</p>
-                </article>
+            <ul id="board-lanes" class="lanes" data-board-slug="{{ board_slug }}" aria-label="Board lanes" aria-describedby="lane-scroll-help" role="list" tabindex="0">
+                {% for lane in board.lanes %}
+                <li class="lane" data-lane-index="{{ loop.index0 }}" aria-labelledby="lane-title-{{ loop.index }}">
+                    <header class="lane-head">
+                        <h2 class="lane-title" id="lane-title-{{ loop.index }}">{{ lane.name }}</h2>
+                        <span class="lane-count" aria-label="{{ t('board.cards_count', count=lane.cards|length) }}">{{ lane.cards|length }}</span>
+                    </header>
+
+                    <ul class="card-list" role="list">
+                        {% for card in lane.cards %}
+                        <li class="card-item" data-card-id="{{ card.id }}">
+                            <article class="card" tabindex="0" data-card-title="{{ card.title }}">
+                                <div class="card-head">
+                                    <h3 class="card-title">{{ card.title }}</h3>
+                                    <button
+                                        class="icon-button card-menu-trigger"
+                                        type="button"
+                                        aria-expanded="false"
+                                        aria-haspopup="menu"
+                                        aria-controls="card-menu-{{ card.id }}"
+                                    >
+                                        <span aria-hidden="true">...</span>
+                                        <span class="sr-only">{{ t('board.card_actions') }}</span>
+                                    </button>
+                                </div>
+                                <p class="card-meta">{{ card.meta }}</p>
+                                <p class="card-status">
+                                    <span class="tag">{{ t('board.status_prefix') }}: {{ card.status }}</span>
+                                </p>
+
+                                <div class="card-menu" id="card-menu-{{ card.id }}" role="menu" hidden>
+                                    <button type="button" role="menuitem" data-card-action="left">
+                                        <span aria-hidden="true">&lt;</span>
+                                        <span>{{ t('board.move_left') }}</span>
+                                    </button>
+                                    <button type="button" role="menuitem" data-card-action="right">
+                                        <span aria-hidden="true">&gt;</span>
+                                        <span>{{ t('board.move_right') }}</span>
+                                    </button>
+                                    <button type="button" role="menuitem" data-card-action="archive" data-confirm="{{ t('board.confirm_archive') }}">
+                                        <span aria-hidden="true">x</span>
+                                        <span>{{ t('board.archive') }}</span>
+                                    </button>
+                                </div>
+                            </article>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <footer class="lane-foot">
+                        <button
+                            class="button button-ghost"
+                            type="button"
+                            data-add-card
+                            data-lane-index="{{ loop.index0 }}"
+                            aria-label="{{ t('board.add_to_lane', lane=lane.name) }}"
+                        >
+                            <span aria-hidden="true">+</span>
+                            <span>{{ t('board.add_card') }}</span>
+                        </button>
+                    </footer>
+                </li>
                 {% endfor %}
-            </div>
+            </ul>
+        </section>
 
-            <footer class="lane-foot">
-                <button class="button button-ghost" type="button">Add card</button>
-            </footer>
-        </article>
-        {% endfor %}
-    </section>
+        <aside class="panel page-aside" aria-labelledby="board-shortcuts-title">
+            <h2 id="board-shortcuts-title">{{ t('board.shortcuts_title') }}</h2>
+            <p class="card-meta">{{ t('board.shortcuts_text') }}</p>
+            <div class="board-actions">
+                <a class="button button-ghost" href="{{ url_for('help_page') }}">{{ t('board.shortcuts_link') }}</a>
+            </div>
+        </aside>
+    </div>
 </div>
 {% endblock %}

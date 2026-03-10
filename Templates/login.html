@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel" aria-labelledby="login-title">
+    <p class="eyebrow">{{ t('brand.name') }}</p>
+    <h1 class="page-title" id="login-title">{{ t('login.title') }}</h1>
+    <p class="lead">{{ t('login.subtitle') }}</p>
+    {% if show_demo_hint %}
+    <p class="card-meta">{{ t('login.demo_hint', email=demo_email, password=demo_password) }}</p>
+    {% endif %}
+</section>
+
+{% if errors %}
+<section class="error-summary" role="alert" aria-labelledby="login-errors-title">
+    <h2 id="login-errors-title">{{ t('error.summary_title') }}</h2>
+    <ul>
+        {% for field, message in errors.items() %}
+        <li><a href="#{{ field }}">{{ message }}</a></li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+<section class="panel" aria-labelledby="login-form-title">
+    <h2 class="sr-only" id="login-form-title">{{ t('login.title') }}</h2>
+    <form class="form-stack" action="{{ url_for('login') }}" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="next" value="{{ next_target }}">
+
+        <div class="field">
+            <label for="email">{{ t('login.email') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+            <input
+                class="input"
+                id="email"
+                name="email"
+                type="email"
+                value="{{ form_values.email }}"
+                autocomplete="email"
+                required
+                maxlength="120"
+                aria-describedby="login-email-help"
+                aria-invalid="{{ 'true' if errors.get('email') else 'false' }}"
+            >
+            <p class="field-help" id="login-email-help">{{ errors.get('email') or t('login.email_help') }}</p>
+        </div>
+
+        <div class="field">
+            <label for="password">{{ t('login.password') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+            <input
+                class="input"
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+                aria-describedby="login-password-help"
+                aria-invalid="{{ 'true' if errors.get('password') else 'false' }}"
+            >
+            <p class="field-help" id="login-password-help">{{ errors.get('password') or t('login.password_help') }}</p>
+        </div>
+
+        <div class="board-actions">
+            <button class="button button-primary" type="submit">
+                <span aria-hidden="true">+</span>
+                <span>{{ t('login.submit') }}</span>
+            </button>
+        </div>
+    </form>
+</section>
+{% endblock %}

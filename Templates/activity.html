@@ -3,28 +3,67 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<section class="panel">
-    <div class="section-head">
-        <div>
-            <p class="eyebrow">Workspace</p>
-            <h1 class="page-title">Activity</h1>
-        </div>
-        <button class="button button-ghost" type="button">Export log</button>
-    </div>
-    <p class="lead">Recent board and card activity from your team.</p>
-</section>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="{{ url_for('home') }}">{{ t('breadcrumbs.home') }}</a></li>
+        <li aria-current="page">{{ t('breadcrumbs.activity') }}</li>
+    </ol>
+</nav>
 
-<section class="panel">
-    <div class="activity-list">
-        {% for item in activity_items %}
-        <article class="card activity-item">
-            <div class="avatar">{{ loop.index }}</div>
+<div class="page-layout">
+    <section class="panel" aria-labelledby="activity-page-title">
+        <div class="section-head">
             <div>
-                <h2 class="card-title">{{ item.title }}</h2>
-                <p class="card-meta">{{ item.meta }}</p>
+                <p class="eyebrow">{{ t('activity.eyebrow') }}</p>
+                <h1 class="page-title" id="activity-page-title">{{ t('activity.title') }}</h1>
             </div>
-        </article>
+            <a class="button button-ghost" href="{{ url_for('export_activity_csv') }}">
+                <span aria-hidden="true">[]</span>
+                <span>{{ t('activity.export') }}</span>
+            </a>
+        </div>
+        <p class="lead">{{ t('activity.lead') }}</p>
+        <p class="status-message status-info" role="status" aria-live="polite">{{ loaded_message }}</p>
+    </section>
+
+    <aside class="panel page-aside privacy-note" aria-labelledby="privacy-title">
+        <h2 id="privacy-title">{{ t('activity.privacy_title') }}</h2>
+        <p class="card-meta">{{ t('activity.privacy_text') }}</p>
+    </aside>
+</div>
+
+<section class="panel" aria-labelledby="activity-feed-title">
+    <h2 class="sr-only" id="activity-feed-title">{{ t('activity.feed_title') }}</h2>
+
+    {% if activity_items %}
+    <ul class="activity-list" role="list">
+        {% for item in activity_items %}
+        <li>
+            <article class="card activity-item" aria-labelledby="activity-item-{{ loop.index }}">
+                <div class="avatar" aria-hidden="true">{{ loop.index }}</div>
+                <div>
+                    <h3 class="card-title" id="activity-item-{{ loop.index }}">{{ item.title }}</h3>
+                    <p class="card-meta">
+                        <span>{{ item.board }}</span>
+                        <span aria-hidden="true"> - </span>
+                        <time class="js-time" datetime="{{ item.time_iso }}">{{ item.display_time }}</time>
+                    </p>
+                </div>
+            </article>
+        </li>
         {% endfor %}
+    </ul>
+
+    {% if has_more %}
+    <div class="board-actions">
+        <a class="button button-primary" href="{{ url_for('activity', page=next_page, loaded=1) }}#activity-feed-title">{{ t('common.load_more') }}</a>
     </div>
+    {% endif %}
+    {% else %}
+    <article class="empty-state" role="status">
+        <h3>{{ t('activity.empty_title') }}</h3>
+        <p>{{ t('activity.empty_text') }}</p>
+    </article>
+    {% endif %}
 </section>
 {% endblock %}

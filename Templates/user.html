@@ -3,40 +3,115 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<section class="panel user-panel">
-    <div class="profile-head">
-        <div class="avatar">GH</div>
-        <div>
-            <h1 class="page-title">Gard H.</h1>
-            <p class="lead">Workspace owner - Product and engineering coordination</p>
-        </div>
-    </div>
-    <div class="tag-row">
-        <span class="tag">12 boards</span>
-        <span class="tag">24 open cards</span>
-        <span class="tag">Last active 20m ago</span>
-    </div>
-</section>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="{{ url_for('home') }}">{{ t('breadcrumbs.home') }}</a></li>
+        <li aria-current="page">{{ t('breadcrumbs.user') }}</li>
+    </ol>
+</nav>
 
-<section class="panel">
-    <h2>Profile</h2>
-    <div class="form-grid">
-        <label>
-            Display Name
-            <input class="input" type="text" value="Gard H." />
-        </label>
-        <label>
-            Email
-            <input class="input" type="email" value="gard@example.com" />
-        </label>
-    </div>
-    <label>
-        About
-        <textarea class="textarea" rows="4">Building Trellar one release at a time.</textarea>
-    </label>
-    <div class="board-actions">
-        <button class="button button-primary" type="button">Save profile</button>
-        <button class="button button-ghost" type="button">Cancel</button>
-    </div>
+<div class="page-layout">
+    <section class="panel user-panel" aria-labelledby="user-page-title">
+        <div class="profile-head">
+            <div class="avatar" aria-hidden="true">GH</div>
+            <div>
+                <h1 class="page-title" id="user-page-title">{{ t('user.title') }}</h1>
+                <p class="lead">{{ t('user.subtitle') }}</p>
+            </div>
+        </div>
+        <ul class="tag-row" role="list">
+            <li><span class="tag">{{ t('user.stats.boards') }}: {{ t('user.stats.boards_value') }}</span></li>
+            <li><span class="tag">{{ t('user.stats.open_cards') }}: {{ t('user.stats.open_cards_value') }}</span></li>
+            <li><span class="tag">{{ t('user.stats.active') }}: {{ t('user.stats.active_value') }}</span></li>
+        </ul>
+    </section>
+
+    <aside class="panel page-aside" aria-labelledby="user-help-title">
+        <h2 id="user-help-title">{{ t('nav.help') }}</h2>
+        <p class="card-meta">{{ t('home.quick_help') }}</p>
+        <a class="button button-ghost" href="{{ url_for('help_page') }}">{{ t('home.quick_link') }}</a>
+    </aside>
+</div>
+
+<section class="panel" aria-labelledby="profile-form-title">
+    <h2 id="profile-form-title">{{ t('user.profile') }}</h2>
+
+    {% if errors %}
+    <section class="error-summary" role="alert" aria-labelledby="profile-errors-title">
+        <h3 id="profile-errors-title">{{ t('error.summary_title') }}</h3>
+        <ul>
+            {% for field, message in errors.items() %}
+            <li><a href="#{{ field }}">{{ message }}</a></li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    <form class="form-stack" action="{{ url_for('user') }}" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <p class="status-message" role="status" aria-live="polite">{{ save_message }}</p>
+
+        <div class="form-grid">
+            <div class="field">
+                <label for="display_name">{{ t('user.display_name') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+                <input
+                    class="input"
+                    id="display_name"
+                    name="display_name"
+                    type="text"
+                    value="{{ form_values.display_name }}"
+                    autocomplete="name"
+                    required
+                    maxlength="80"
+                    aria-describedby="display-name-help"
+                    aria-invalid="{{ 'true' if errors.get('display_name') else 'false' }}"
+                >
+                <p class="field-help" id="display-name-help">{{ errors.get('display_name') or t('user.display_name_help') }}</p>
+            </div>
+            <div class="field">
+                <label for="email">{{ t('user.email') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+                <input
+                    class="input"
+                    id="email"
+                    name="email"
+                    type="email"
+                    value="{{ form_values.email }}"
+                    autocomplete="email"
+                    required
+                    maxlength="120"
+                    aria-describedby="email-help"
+                    aria-invalid="{{ 'true' if errors.get('email') else 'false' }}"
+                >
+                <p class="field-help" id="email-help">{{ errors.get('email') or t('user.email_help') }}</p>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="about">{{ t('user.about') }}</label>
+            <textarea
+                class="textarea"
+                id="about"
+                name="about"
+                rows="4"
+                maxlength="280"
+                data-char-count="about-count"
+                aria-describedby="about-help about-count"
+                aria-invalid="{{ 'true' if errors.get('about') else 'false' }}"
+            >{{ form_values.about }}</textarea>
+            <p class="field-help" id="about-help">{{ errors.get('about') or t('user.about_help') }}</p>
+            <p class="char-counter" id="about-count"></p>
+        </div>
+
+        <div class="board-actions">
+            <button class="button button-primary" type="submit">
+                <span aria-hidden="true">+</span>
+                <span>{{ t('common.save') }}</span>
+            </button>
+            <button class="button button-ghost" type="reset" data-confirm="{{ t('confirm.title') }}">
+                <span aria-hidden="true">x</span>
+                <span>{{ t('common.reset') }}</span>
+            </button>
+        </div>
+    </form>
 </section>
 {% endblock %}

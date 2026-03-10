@@ -1,0 +1,62 @@
+name: Accessibility and Performance
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend test tooling
+        run: |
+          npm install --no-save @lhci/cli @axe-core/cli @playwright/test wait-on browser-driver-manager
+          npx playwright install --with-deps chromium
+
+      - name: Start Flask app
+        run: |
+          python -m flask --app app run --host 127.0.0.1 --port 5000 > /tmp/trellar.log 2>&1 &
+
+      - name: Wait for app
+        run: npx wait-on http://127.0.0.1:5000
+
+      - name: Run Lighthouse collect + assert
+        run: |
+          npx lhci collect --config=lighthouserc.json
+          npx lhci assert --config=lighthouserc.json
+
+      - name: Sync Chrome + ChromeDriver for Axe
+        run: npx browser-driver-manager install chrome
+
+      - name: Run Axe CLI checks
+        run: |
+          npx axe http://127.0.0.1:5000 \
+            http://127.0.0.1:5000/boards \
+            http://127.0.0.1:5000/boards/product-roadmap \
+            http://127.0.0.1:5000/user \
+            http://127.0.0.1:5000/settings \
+            http://127.0.0.1:5000/activity
+
+      - name: Run keyboard E2E tests
+        run: npx playwright test --config=playwright.config.js

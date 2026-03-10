@@ -3,46 +3,136 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<section class="panel">
-    <p class="eyebrow">Workspace</p>
-    <h1 class="page-title">Settings</h1>
-    <p class="lead">Manage team preferences, notifications, and board defaults.</p>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="{{ url_for('home') }}">{{ t('breadcrumbs.home') }}</a></li>
+        <li aria-current="page">{{ t('breadcrumbs.settings') }}</li>
+    </ol>
+</nav>
+
+<section class="panel" aria-labelledby="settings-page-title">
+    <p class="eyebrow">{{ t('settings.eyebrow') }}</p>
+    <h1 class="page-title" id="settings-page-title">{{ t('settings.title') }}</h1>
+    <p class="lead">{{ t('settings.lead') }}</p>
 </section>
 
-<section class="settings-grid">
-    <article class="panel">
-        <h2>General</h2>
-        <label>
-            Workspace Name
-            <input class="input" type="text" value="Trellar Team" />
-        </label>
-        <label>
-            Default Visibility
-            <input class="input" type="text" value="Private" />
-        </label>
-    </article>
-
-    <article class="panel">
-        <h2>Notifications</h2>
-        <label>
-            Email digest frequency
-            <input class="input" type="text" value="Daily" />
-        </label>
-        <label>
-            Channel
-            <input class="input" type="text" value="#trellar-updates" />
-        </label>
-    </article>
-    <article class="panel">
-        <h2>Automation</h2>
-        <label>
-            Card template
-            <textarea class="textarea" rows="4">Owner - Due date - Acceptance criteria</textarea>
-        </label>
-        <div class="board-actions">
-            <button class="button button-primary" type="button">Save changes</button>
-            <button class="button button-ghost" type="button">Reset</button>
-        </div>
-    </article>
+{% if errors %}
+<section class="error-summary" role="alert" aria-labelledby="settings-errors-title">
+    <h2 id="settings-errors-title">{{ t('error.summary_title') }}</h2>
+    <ul>
+        {% for field, message in errors.items() %}
+        <li><a href="#{{ field }}">{{ message }}</a></li>
+        {% endfor %}
+    </ul>
 </section>
+{% endif %}
+
+<form action="{{ url_for('settings') }}" method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p class="status-message" role="status" aria-live="polite">{{ save_message }}</p>
+
+    <section class="settings-grid" aria-labelledby="workspace-settings-title">
+        <h2 class="sr-only" id="workspace-settings-title">{{ t('settings.title') }}</h2>
+
+        <article class="panel">
+            <h3>{{ t('settings.general') }}</h3>
+            <div class="field">
+                <label for="workspace_name">{{ t('settings.workspace_name') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+                <input
+                    class="input"
+                    id="workspace_name"
+                    name="workspace_name"
+                    type="text"
+                    value="{{ form_values.workspace_name }}"
+                    autocomplete="organization"
+                    required
+                    maxlength="100"
+                    aria-describedby="workspace-name-help"
+                    aria-invalid="{{ 'true' if errors.get('workspace_name') else 'false' }}"
+                >
+                <p class="field-help" id="workspace-name-help">{{ errors.get('workspace_name') or t('settings.workspace_help') }}</p>
+            </div>
+            <div class="field">
+                <label for="default_visibility">{{ t('settings.default_visibility') }}</label>
+                <select
+                    class="input"
+                    id="default_visibility"
+                    name="default_visibility"
+                    required
+                    aria-describedby="visibility-help"
+                    aria-invalid="{{ 'true' if errors.get('default_visibility') else 'false' }}"
+                >
+                    <option value="private" {% if form_values.default_visibility == 'private' %}selected{% endif %}>{{ t('settings.visibility.private') }}</option>
+                    <option value="workspace" {% if form_values.default_visibility == 'workspace' %}selected{% endif %}>{{ t('settings.visibility.workspace') }}</option>
+                    <option value="public" {% if form_values.default_visibility == 'public' %}selected{% endif %}>{{ t('settings.visibility.public') }}</option>
+                </select>
+                <p class="field-help" id="visibility-help">{{ errors.get('default_visibility') or t('settings.visibility_help') }}</p>
+            </div>
+        </article>
+
+        <article class="panel">
+            <h3>{{ t('settings.notifications') }}</h3>
+            <div class="field">
+                <label for="digest_frequency">{{ t('settings.digest') }}</label>
+                <select
+                    class="input"
+                    id="digest_frequency"
+                    name="digest_frequency"
+                    required
+                    aria-describedby="digest-help"
+                    aria-invalid="{{ 'true' if errors.get('digest_frequency') else 'false' }}"
+                >
+                    <option value="daily" {% if form_values.digest_frequency == 'daily' %}selected{% endif %}>{{ t('settings.digest.daily') }}</option>
+                    <option value="weekly" {% if form_values.digest_frequency == 'weekly' %}selected{% endif %}>{{ t('settings.digest.weekly') }}</option>
+                    <option value="off" {% if form_values.digest_frequency == 'off' %}selected{% endif %}>{{ t('settings.digest.off') }}</option>
+                </select>
+                <p class="field-help" id="digest-help">{{ errors.get('digest_frequency') or t('settings.digest_help') }}</p>
+            </div>
+            <div class="field">
+                <label for="channel">{{ t('settings.channel') }}</label>
+                <input
+                    class="input"
+                    id="channel"
+                    name="channel"
+                    type="text"
+                    value="{{ form_values.channel }}"
+                    autocomplete="off"
+                    maxlength="80"
+                    aria-describedby="channel-help"
+                    aria-invalid="{{ 'true' if errors.get('channel') else 'false' }}"
+                >
+                <p class="field-help" id="channel-help">{{ errors.get('channel') or t('settings.channel_help') }}</p>
+            </div>
+        </article>
+
+        <article class="panel">
+            <h3>{{ t('settings.automation') }}</h3>
+            <div class="field">
+                <label for="card_template">{{ t('settings.card_template') }}</label>
+                <textarea
+                    class="textarea"
+                    id="card_template"
+                    name="card_template"
+                    rows="4"
+                    maxlength="320"
+                    data-char-count="card-template-count"
+                    aria-describedby="card-template-help card-template-count"
+                    aria-invalid="{{ 'true' if errors.get('card_template') else 'false' }}"
+                >{{ form_values.card_template }}</textarea>
+                <p class="field-help" id="card-template-help">{{ errors.get('card_template') or t('settings.card_template_help') }}</p>
+                <p class="char-counter" id="card-template-count"></p>
+            </div>
+            <div class="board-actions">
+                <button class="button button-primary" type="submit">
+                    <span aria-hidden="true">+</span>
+                    <span>{{ t('common.save') }}</span>
+                </button>
+                <button class="button button-ghost" type="reset" data-confirm="{{ t('confirm.title') }}">
+                    <span aria-hidden="true">x</span>
+                    <span>{{ t('common.reset') }}</span>
+                </button>
+            </div>
+        </article>
+    </section>
+</form>
 {% endblock %}

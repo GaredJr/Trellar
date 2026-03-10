@@ -3,27 +3,121 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<section class="panel">
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="{{ url_for('home') }}">{{ t('breadcrumbs.home') }}</a></li>
+        <li aria-current="page">{{ t('breadcrumbs.boards') }}</li>
+    </ol>
+</nav>
+
+<section class="panel" aria-labelledby="boards-page-title">
     <div class="section-head">
         <div>
-            <p class="eyebrow">Workspace</p>
-            <h1 class="page-title">Boards</h1>
+            <p class="eyebrow">{{ t('boards.eyebrow') }}</p>
+            <h1 class="page-title" id="boards-page-title">{{ t('boards.title') }}</h1>
         </div>
-        <button class="button button-primary" type="button">Create board</button>
+        <button class="button button-primary" type="button" data-create-board aria-label="{{ t('boards.create') }}">
+            <span aria-hidden="true">+</span>
+            <span>{{ t('boards.create') }}</span>
+        </button>
     </div>
-    <p class="lead">All active boards in your Trellar workspace.</p>
+    <p class="lead">{{ t('boards.lead') }}</p>
+
+    <div class="filter-toolbar">
+        <button
+            class="button button-ghost"
+            type="button"
+            data-toggle-target="board-filter-panel"
+            aria-expanded="{{ 'true' if filters_open else 'false' }}"
+            aria-controls="board-filter-panel"
+        >
+            <span aria-hidden="true">=</span>
+            <span>{{ t('boards.toggle_filters') }}</span>
+        </button>
+    </div>
+
+    <div class="filter-panel" id="board-filter-panel" {% if not filters_open %}hidden{% endif %}>
+        <h2 class="sr-only">{{ t('boards.filters') }}</h2>
+        <form action="{{ url_for('boards') }}" method="get" class="filter-form" novalidate>
+            <div class="field">
+                <label for="board-query">{{ t('boards.search_label') }}</label>
+                <input
+                    class="input"
+                    id="board-query"
+                    name="q"
+                    type="search"
+                    value="{{ search_query }}"
+                    autocomplete="off"
+                    placeholder="{{ t('boards.search_placeholder') }}"
+                />
+            </div>
+
+            <div class="field">
+                <label for="board-sort">{{ t('boards.sort_label') }}</label>
+                <select class="input" id="board-sort" name="sort">
+                    <option value="name_asc" {% if sort_option == 'name_asc' %}selected{% endif %}>{{ t('boards.sort.name_asc') }}</option>
+                    <option value="name_desc" {% if sort_option == 'name_desc' %}selected{% endif %}>{{ t('boards.sort.name_desc') }}</option>
+                    <option value="members_desc" {% if sort_option == 'members_desc' %}selected{% endif %}>{{ t('boards.sort.members_desc') }}</option>
+                    <option value="members_asc" {% if sort_option == 'members_asc' %}selected{% endif %}>{{ t('boards.sort.members_asc') }}</option>
+                </select>
+            </div>
+
+            <fieldset class="chip-group" aria-label="{{ t('boards.member_label') }}">
+                <legend>{{ t('boards.member_label') }}</legend>
+
+                <label class="chip-option">
+                    <input type="radio" name="member" value="all" {% if member_filter == 'all' %}checked{% endif %}>
+                    <span>{{ t('boards.member.all') }}</span>
+                </label>
+                <label class="chip-option">
+                    <input type="radio" name="member" value="small" {% if member_filter == 'small' %}checked{% endif %}>
+                    <span>{{ t('boards.member.small') }}</span>
+                </label>
+                <label class="chip-option">
+                    <input type="radio" name="member" value="medium" {% if member_filter == 'medium' %}checked{% endif %}>
+                    <span>{{ t('boards.member.medium') }}</span>
+                </label>
+                <label class="chip-option">
+                    <input type="radio" name="member" value="large" {% if member_filter == 'large' %}checked{% endif %}>
+                    <span>{{ t('boards.member.large') }}</span>
+                </label>
+            </fieldset>
+
+            <div class="board-actions">
+                <button class="button button-primary" type="submit">
+                    <span aria-hidden="true">*</span>
+                    <span>{{ t('common.filter') }}</span>
+                </button>
+                <a class="button button-ghost" href="{{ url_for('boards') }}">{{ t('common.reset') }}</a>
+            </div>
+        </form>
+    </div>
 </section>
 
-<section class="board-grid">
-    {% for board in boards %}
-    <article class="panel board-tile">
-        <h2>{{ board.name }}</h2>
-        <p class="card-meta">{{ board.description }}</p>
-        <div class="board-tile-foot">
-            <span class="tag">{{ board.members }} members</span>
-            <a class="button button-ghost" href="{{ url_for('board', slug=board.slug) }}">Open board</a>
-        </div>
+<p class="status-message status-info" role="status" aria-live="polite">{{ status_message }}</p>
+
+<section aria-labelledby="boards-list-title">
+    <h2 class="sr-only" id="boards-list-title">{{ t('boards.title') }}</h2>
+    {% if boards %}
+    <ul class="board-grid" role="list">
+        {% for board in boards %}
+        <li>
+            <article class="panel board-tile" aria-labelledby="board-tile-{{ loop.index }}">
+                <h3 id="board-tile-{{ loop.index }}">{{ board.name }}</h3>
+                <p class="card-meta">{{ board.description }}</p>
+                <div class="board-tile-foot">
+                    <span class="tag">{{ t('boards.members', count=board.members) }}</span>
+                    <a class="button button-ghost" href="{{ url_for('board', slug=board.slug) }}">{{ t('boards.open') }}</a>
+                </div>
+            </article>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <article class="panel empty-state" role="status">
+        <h3>{{ t('boards.empty_title') }}</h3>
+        <p>{{ t('boards.empty_text') }}</p>
     </article>
-    {% endfor %}
+    {% endif %}
 </section>
 {% endblock %}

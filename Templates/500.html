@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel error-panel" aria-labelledby="error-title">
+    <p class="eyebrow">500</p>
+    <h1 class="page-title" id="error-title">{{ t('error.server_title') }}</h1>
+    <p class="lead">{{ t('error.server_text') }}</p>
+    <div class="board-actions">
+        <a class="button button-primary" href="{{ url_for('home') }}">{{ t('error.go_home') }}</a>
+        <a class="button button-ghost" href="{{ url_for('boards') }}">{{ t('error.go_boards') }}</a>
+    </div>
+</section>
+{% endblock %}

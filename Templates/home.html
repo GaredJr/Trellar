@@ -3,35 +3,60 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<section class="panel hero-panel">
-    <p class="eyebrow">Workspace Overview</p>
-    <h1 class="page-title">Plan faster with boards that stay focused.</h1>
-    <p class="lead">
-        Trellar keeps your team aligned with clean, readable boards and a calm workflow.
-        Start from existing boards or jump straight into the active roadmap.
-    </p>
-    <div class="board-actions">
-        <a class="button button-primary" href="{{ url_for('boards') }}">Open boards</a>
-        <a class="button button-ghost" href="{{ url_for('board_alias') }}">Open sample board</a>
-    </div>
-</section>
+<div class="page-layout">
+    <section class="panel hero-panel" aria-labelledby="home-hero-title">
+        <p class="eyebrow">{{ t('home.eyebrow') }}</p>
+        <h1 class="page-title" id="home-hero-title">{{ t('home.title') }}</h1>
+        <p class="lead">{{ t('home.lead') }}</p>
+        <div class="board-actions">
+            <a class="button button-primary" href="{{ url_for('boards') }}">
+                <span aria-hidden="true">+</span>
+                <span>{{ t('home.open_boards') }}</span>
+            </a>
+            <a class="button button-ghost" href="{{ url_for('board_alias') }}">
+                <span aria-hidden="true">[]</span>
+                <span>{{ t('home.open_sample') }}</span>
+            </a>
+        </div>
+    </section>
 
-<section class="panel">
+    <aside class="panel page-aside" aria-labelledby="quick-actions-title">
+        <h2 id="quick-actions-title">{{ t('home.quick_title') }}</h2>
+        <p class="card-meta">{{ t('home.quick_help') }}</p>
+        <div class="board-actions">
+            <a class="button button-ghost" href="{{ url_for('help_page') }}">
+                <span aria-hidden="true">?</span>
+                <span>{{ t('home.quick_link') }}</span>
+            </a>
+        </div>
+    </aside>
+</div>
+
+<section class="panel" aria-labelledby="recent-boards-title">
     <div class="section-head">
-        <h2>Recent Boards</h2>
-        <a class="button button-ghost" href="{{ url_for('boards') }}">View all</a>
+        <h2 id="recent-boards-title">{{ t('home.recent_title') }}</h2>
+        <a class="button button-ghost" href="{{ url_for('boards') }}">{{ t('home.view_all') }}</a>
     </div>
-    <div class="board-grid">
+    {% if boards %}
+    <ul class="board-grid" role="list">
         {% for board in boards %}
-        <a class="card board-card" href="{{ url_for('board', slug=board.slug) }}">
-            <h3 class="card-title">{{ board.name }}</h3>
-            <p class="card-meta">{{ board.description }}</p>
-            <div class="board-card-foot">
-                <span class="tag">{{ board.members }} members</span>
-                <span class="button button-ghost">Open</span>
-            </div>
-        </a>
+        <li>
+            <article class="card board-card" aria-labelledby="recent-board-{{ loop.index }}">
+                <h3 class="card-title" id="recent-board-{{ loop.index }}">{{ board.name }}</h3>
+                <p class="card-meta">{{ board.description }}</p>
+                <div class="board-card-foot">
+                    <span class="tag">{{ t('boards.members', count=board.members) }}</span>
+                    <a class="button button-ghost" href="{{ url_for('board', slug=board.slug) }}">{{ t('boards.open') }}</a>
+                </div>
+            </article>
+        </li>
         {% endfor %}
-    </div>
+    </ul>
+    {% else %}
+    <article class="empty-state" role="status">
+        <h3>{{ t('boards.empty_title') }}</h3>
+        <p>{{ t('boards.empty_text') }}</p>
+    </article>
+    {% endif %}
 </section>
 {% endblock %}
