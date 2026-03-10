@@ -31,7 +31,7 @@ jobs:
 
       - name: Install frontend test tooling
         run: |
-          npm install --no-save @lhci/cli @axe-core/cli @playwright/test wait-on
+          npm install --no-save @lhci/cli @axe-core/cli @playwright/test wait-on browser-driver-manager
           npx playwright install --with-deps chromium
 
       - name: Start Flask app
@@ -45,6 +45,9 @@ jobs:
         run: |
           npx lhci collect --config=lighthouserc.json
           npx lhci assert --config=lighthouserc.json
+
+      - name: Sync Chrome + ChromeDriver for Axe
+        run: npx browser-driver-manager install chrome
 
       - name: Run Axe CLI checks
         run: |
