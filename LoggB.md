@@ -90,3 +90,10 @@ Definition of done:
 - Must be responsive, phone-friendly, and immediately usable across multiple pages.
 
 ```
+
+Deretter brukte jeg litt mer enn en times tid på å refine dette produktet. Jeg lagde også et kanban brett for å tracke endringer og planer.
+
+Flask prosjektet fungerer fint, og det eneste som mangler for morgendagen er litt backend + cloudflare + supabase
+
+<img src="assets/Screenshot%202026-03-10%20at%2015.21.27-1.png" alt="" width="520" height="325" />
+<img src="assets/Screenshot%202026-03-10%20at%2015.21.27.png" alt="" width="520" height="325" />
