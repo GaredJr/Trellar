@@ -66,6 +66,10 @@
                 <span aria-hidden="true">+</span>
                 <span>{{ t('login.submit') }}</span>
             </button>
+            <a class="button button-ghost" href="{{ url_for('signup', next=next_target) }}">
+                <span aria-hidden="true">+</span>
+                <span>{{ t('login.create_account') }}</span>
+            </a>
         </div>
     </form>
 </section>

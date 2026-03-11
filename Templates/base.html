@@ -40,6 +40,7 @@
                         <a href="{{ url_for('help_page') }}" {% if active_page == 'help' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.help') }}</a>
                         {% else %}
                         <a href="{{ url_for('login') }}" {% if active_page == 'login' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.login') }}</a>
+                        <a href="{{ url_for('signup') }}" {% if active_page == 'signup' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.signup') }}</a>
                         {% endif %}
                     </nav>
 
