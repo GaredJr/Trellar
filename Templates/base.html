@@ -40,6 +40,7 @@
                         <a href="{{ url_for('help_page') }}" {% if active_page == 'help' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.help') }}</a>
                         {% else %}
                         <a href="{{ url_for('login') }}" {% if active_page == 'login' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.login') }}</a>
+                        <a href="{{ url_for('signup') }}" {% if active_page == 'signup' %}class="is-active" aria-current="page"{% endif %}>{{ t('nav.signup') }}</a>
                         {% endif %}
                     </nav>
 
@@ -176,35 +177,7 @@
 
     <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
 
-    <script>
-        window.trellarMessages = {
-            undo: {{ t('common.undo')|tojson }},
-            statusSaving: {{ t('status.saving')|tojson }},
-            boardMoved: {{ t('board.moved', title='__TITLE__', lane='__LANE__')|tojson }},
-            boardArchived: {{ t('board.archived', title='__TITLE__')|tojson }},
-            boardUndoDone: {{ t('board.undo_done')|tojson }},
-            boardAdded: {{ t('board.added', title='__TITLE__', lane='__LANE__')|tojson }},
-            boardAddPromptTitle: {{ t('board.add_prompt_title')|tojson }},
-            boardAddPromptMeta: {{ t('board.add_prompt_meta')|tojson }},
-            boardAddError: {{ t('board.add_error')|tojson }},
-            boardCreatePromptName: {{ t('boards.create_prompt_name')|tojson }},
-            boardCreatePromptDescription: {{ t('boards.create_prompt_description')|tojson }},
-            boardCreateError: {{ t('boards.create_error')|tojson }},
-            boardCreateTitle: {{ t('boards.create')|tojson }},
-            boardCreateDescription: {{ t('boards.lead')|tojson }},
-            boardCardActions: {{ t('board.card_actions')|tojson }},
-            boardMoveLeft: {{ t('board.move_left')|tojson }},
-            boardMoveRight: {{ t('board.move_right')|tojson }},
-            boardArchive: {{ t('board.archive')|tojson }},
-            boardStatusPrefix: {{ t('board.status_prefix')|tojson }},
-            boardConfirmArchive: {{ t('board.confirm_archive')|tojson }},
-            boardAddTitle: {{ t('board.add_card')|tojson }},
-            boardAddToLane: {{ t('board.add_to_lane', lane='__LANE__')|tojson }},
-            errorRequired: {{ t('error.required')|tojson }},
-            commonCreate: {{ t('common.create')|tojson }},
-            csrfToken: {{ csrf_token|tojson }}
-        };
-    </script>
+    <script id="trellar-messages" type="application/json">{{ trellar_messages|tojson }}</script>
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </body>
 </html>

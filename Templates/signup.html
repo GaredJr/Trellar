@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel" aria-labelledby="signup-title">
+    <p class="eyebrow">{{ t('brand.name') }}</p>
+    <h1 class="page-title" id="signup-title">{{ t('signup.title') }}</h1>
+    <p class="lead">{{ t('signup.subtitle') }}</p>
+</section>
+
+{% if errors %}
+<section class="error-summary" role="alert" aria-labelledby="signup-errors-title">
+    <h2 id="signup-errors-title">{{ t('error.summary_title') }}</h2>
+    <ul>
+        {% for field, message in errors.items() %}
+        <li><a href="#{{ field }}">{{ message }}</a></li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+<section class="panel" aria-labelledby="signup-form-title">
+    <h2 class="sr-only" id="signup-form-title">{{ t('signup.title') }}</h2>
+    <form class="form-stack" action="{{ url_for('signup') }}" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="next" value="{{ next_target }}">
+
+        <div class="field">
+            <label for="email">{{ t('signup.email') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+            <input
+                class="input"
+                id="email"
+                name="email"
+                type="email"
+                value="{{ form_values.email }}"
+                autocomplete="email"
+                required
+                maxlength="120"
+                aria-describedby="signup-email-help"
+                aria-invalid="{{ 'true' if errors.get('email') else 'false' }}"
+            >
+            <p class="field-help" id="signup-email-help">{{ errors.get('email') or t('login.email_help') }}</p>
+        </div>
+
+        <div class="field">
+            <label for="password">{{ t('signup.password') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+            <input
+                class="input"
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                required
+                minlength="8"
+                aria-describedby="signup-password-help"
+                aria-invalid="{{ 'true' if errors.get('password') else 'false' }}"
+            >
+            <p class="field-help" id="signup-password-help">{{ errors.get('password') or t('signup.password_help') }}</p>
+        </div>
+
+        <div class="field">
+            <label for="password_confirm">{{ t('signup.password_confirm') }} <span class="required-indicator" aria-hidden="true">*</span><span class="sr-only">{{ t('common.required') }}</span></label>
+            <input
+                class="input"
+                id="password_confirm"
+                name="password_confirm"
+                type="password"
+                autocomplete="new-password"
+                required
+                minlength="8"
+                aria-describedby="signup-password-confirm-help"
+                aria-invalid="{{ 'true' if errors.get('password_confirm') else 'false' }}"
+            >
+            <p class="field-help" id="signup-password-confirm-help">{{ errors.get('password_confirm') or t('signup.password_confirm') }}</p>
+        </div>
+
+        <div class="board-actions">
+            <button class="button button-primary" type="submit">
+                <span aria-hidden="true">+</span>
+                <span>{{ t('signup.submit') }}</span>
+            </button>
+            <a class="button button-ghost" href="{{ url_for('login', next=next_target) }}">
+                <span aria-hidden="true">+</span>
+                <span>{{ t('signup.already_have') }}</span>
+            </a>
+        </div>
+    </form>
+</section>
+{% endblock %}

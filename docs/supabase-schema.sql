@@ -1,22 +1,3 @@
-# Dag 3
-
-### 11.03.2026
-
-
-Startet dagen med å få opp nettet på server linuxen min.
-```
-sudo iw dev wlp2s0 set power_save off
-nmcli radio wifi off
-nmcli radio wifi on
-```
-Hadde fortsatt problemet med at power saving så ut til å skru seg på etter tid, så jeg måtte skru dette av permament.
-
-Deretter fikk jeg startet på supabase oppsettet.
-Lagde et prosjekt som heter Trellar og skrudde på Email Auth.
-
-Så fikk jeg codex til å sette opp det generelle i repoet her. Her er også SQLen som jeg fikk:
-
-```
 -- Trellar Supabase schema + RLS
 -- Run this in Supabase SQL Editor.
 
@@ -157,5 +138,3 @@ create policy activity_own on public.activity
 for all to authenticated
 using ((select auth.uid()) = owner_id)
 with check ((select auth.uid()) = owner_id);
-
-```
