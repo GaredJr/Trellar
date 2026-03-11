@@ -21,6 +21,14 @@ Deretter koble opp siden på cloudflare domenet mitt med en tunnel.
 - Python Flask
 - Ubuntu Server
 
+## Deployment guide
+
+For production hosting on Ubuntu + Cloudflare Tunnel, use:
+
+- `docs/ubuntu-cloudflare-deploy.md`
+- `scripts/install_ubuntu_service.sh`
+- `scripts/install_cloudflare_tunnel.sh`
+
 ## Ubuntu Server Oppsett:
 
 Det jeg startet med å få gjort er å flashe ubuntu server på en gammel laptop.
@@ -206,4 +214,3 @@ sudo systemctl restart systemd-logind
 ```
 
 Dette gjør at maskinen fortsetter å kjøre selv om lokket lukkes.
-

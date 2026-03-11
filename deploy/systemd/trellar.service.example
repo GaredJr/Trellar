@@ -1,0 +1,18 @@
+[Unit]
+Description=Trellar Flask app (Gunicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trellar
+Group=trellar
+WorkingDirectory=/opt/trellar
+EnvironmentFile=-/opt/trellar/.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/trellar/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 --access-logfile - --error-logfile - app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
