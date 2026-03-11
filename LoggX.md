@@ -159,3 +159,8 @@ using ((select auth.uid()) = owner_id)
 with check ((select auth.uid()) = owner_id);
 
 ```
+
+
+Så brukte jeg ca en time på å få hosta serveren på en ssh tunnel via ubuntu serveren min.
+Nå kjører den på http://localhost:8000
+Da mangler det bare hovedsakelig å få den opp på en cloudflare tunnel så den er tilgjengelig overalt.
