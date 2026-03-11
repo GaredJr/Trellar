@@ -815,6 +815,36 @@ def translate_text(key: str, locale: str | None = None, **kwargs: object) -> str
         return text
 
 
+def build_trellar_messages(locale: str, csrf_token: str) -> dict[str, str]:
+    return {
+        "undo": translate_text("common.undo", locale=locale),
+        "statusSaving": translate_text("status.saving", locale=locale),
+        "boardMoved": translate_text("board.moved", locale=locale, title="__TITLE__", lane="__LANE__"),
+        "boardArchived": translate_text("board.archived", locale=locale, title="__TITLE__"),
+        "boardUndoDone": translate_text("board.undo_done", locale=locale),
+        "boardAdded": translate_text("board.added", locale=locale, title="__TITLE__", lane="__LANE__"),
+        "boardAddPromptTitle": translate_text("board.add_prompt_title", locale=locale),
+        "boardAddPromptMeta": translate_text("board.add_prompt_meta", locale=locale),
+        "boardAddError": translate_text("board.add_error", locale=locale),
+        "boardCreatePromptName": translate_text("boards.create_prompt_name", locale=locale),
+        "boardCreatePromptDescription": translate_text("boards.create_prompt_description", locale=locale),
+        "boardCreateError": translate_text("boards.create_error", locale=locale),
+        "boardCreateTitle": translate_text("boards.create", locale=locale),
+        "boardCreateDescription": translate_text("boards.lead", locale=locale),
+        "boardCardActions": translate_text("board.card_actions", locale=locale),
+        "boardMoveLeft": translate_text("board.move_left", locale=locale),
+        "boardMoveRight": translate_text("board.move_right", locale=locale),
+        "boardArchive": translate_text("board.archive", locale=locale),
+        "boardStatusPrefix": translate_text("board.status_prefix", locale=locale),
+        "boardConfirmArchive": translate_text("board.confirm_archive", locale=locale),
+        "boardAddTitle": translate_text("board.add_card", locale=locale),
+        "boardAddToLane": translate_text("board.add_to_lane", locale=locale, lane="__LANE__"),
+        "errorRequired": translate_text("error.required", locale=locale),
+        "commonCreate": translate_text("common.create", locale=locale),
+        "csrfToken": csrf_token,
+    }
+
+
 def get_csrf_token() -> str:
     token = session.get("_csrf_token")
     if token:
@@ -1149,6 +1179,7 @@ def protect_post_requests() -> object | None:
 def inject_template_context() -> dict[str, object]:
     locale = get_locale()
     current_user = get_current_user()
+    csrf_token = get_csrf_token()
 
     def t(key: str, **kwargs: object) -> str:
         return translate_text(key, locale=locale, **kwargs)
@@ -1167,7 +1198,8 @@ def inject_template_context() -> dict[str, object]:
         "document_lang": locale,
         "document_dir": get_document_dir(locale),
         "available_languages": languages,
-        "csrf_token": get_csrf_token(),
+        "csrf_token": csrf_token,
+        "trellar_messages": build_trellar_messages(locale, csrf_token),
         "is_authenticated": current_user is not None,
         "current_user": current_user,
     }

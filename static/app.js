@@ -2,7 +2,24 @@
     "use strict";
 
     const root = document.documentElement;
-    const messages = window.trellarMessages || {};
+    const readMessages = () => {
+        const script = document.getElementById("trellar-messages");
+        if (script) {
+            try {
+                return JSON.parse(script.textContent || "{}");
+            } catch (_error) {
+                return {};
+            }
+        }
+
+        if (window.trellarMessages && typeof window.trellarMessages === "object") {
+            return window.trellarMessages;
+        }
+
+        return {};
+    };
+
+    const messages = readMessages();
     const csrfToken = messages.csrfToken || "";
 
     const postJson = async (url, payload) => {
