@@ -164,3 +164,16 @@ with check ((select auth.uid()) = owner_id);
 Så brukte jeg ca en time på å få hosta serveren på en ssh tunnel via ubuntu serveren min.
 Nå kjører den på http://localhost:8000
 Da mangler det bare hovedsakelig å få den opp på en cloudflare tunnel så den er tilgjengelig overalt.
+
+
+# Add cloudflare gpg key
+sudo mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+
+# Add this repo to your apt repositories
+echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+
+# install cloudflared
+sudo apt-get update && sudo apt-get install cloudflared
+
+sudo cloudflared service install eyJhIjoiMTM2OTM2ZjBhYjA5MzJmZmM2MGEyYWNjZGNlZWZjMTUiLCJ0IjoiYzhmNjcwZmMtMzJhYy00ZWFkLWJmYjYtYjg2MTNhYmYwOWQ1IiwicyI6IllXVXpabU01WW1NdFpUVmxPUzAwTlRnMUxUazJaakV0TUdVeE0yWmlORFUxTlRjNSJ9
